@@ -14,7 +14,7 @@
         >
           <div
             :class="[
-              color.selectedColor,
+              color.ringColor,
               active && checked ? 'ring ring-offset-1' : '',
               !active && checked ? 'ring-2' : '',
               '-m-0.5 relative p-0.5 rounded-full flex items-center justify-center cursor-pointer focus:outline-none',
@@ -51,7 +51,10 @@
           :class="[
             seatPerTableError
               ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500 placeholder-red-300'
-              : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500',
+              : 'border-gray-300 ' +
+                (selectedColor?.focusBorderColor || 'focus:border-indigo-500') +
+                ' ' +
+                (selectedColor?.focusRingColor || 'focus:ring-indigo-500'),
           ]"
           aria-invalid="true"
           aria-describedby="seatPerTable-error"
@@ -79,7 +82,12 @@
   <div class="mt-8 flex justify-between">
     <button
       type="button"
-      class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 pl-3 pr-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      :class="[
+        selectedColor?.bgColor,
+        selectedColor?.bgColorHover,
+        selectedColor?.focusRingColor,
+      ]"
       @click="changeStep('venue')"
     >
       <ChevronLeftIcon class="mr-2 h-5 w-5" aria-hidden="true" />
@@ -87,10 +95,15 @@
     </button>
     <button
       type="button"
-      class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 hover:bg-indigo-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      :class="[
+        selectedColor?.bgColor,
+        selectedColor?.bgColorHover,
+        selectedColor?.focusRingColor,
+      ]"
       @click="changeStep('catering')"
     >
-      Hungry?
+      Next
       <ChevronRightIcon class="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
     </button>
   </div>
@@ -99,41 +112,70 @@
 <script setup lang="ts">
 import { useGlobalState } from '@/store';
 import { RadioGroup, RadioGroupLabel, RadioGroupOption } from '@headlessui/vue';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/20/solid';
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ExclamationCircleIcon,
+} from '@heroicons/vue/20/solid';
 
 const colors = [
   {
     name: 'Pink',
     bgColor: 'bg-pink-500',
-    selectedColor: 'ring-pink-500',
+    bgColorHover: 'hover:bg-pink-600',
+    ringColor: 'ring-pink-500',
+    focusRingColor: 'focus:ring-pink-500',
+    borderColor: 'border-pink-500',
+    focusBorderColor: 'focus:border-pink-500',
+    textColor: 'text-pink-600',
     description:
       'Rose, a pale tint of red, is often associated with love and romance.',
   },
   {
     name: 'Purple',
     bgColor: 'bg-purple-500',
-    selectedColor: 'ring-purple-500',
+    bgColorHover: 'hover:bg-purple-600',
+    ringColor: 'ring-purple-500',
+    focusRingColor: 'focus:ring-purple-500',
+    borderColor: 'border-purple-500',
+    focusBorderColor: 'focus:border-purple-500',
+    textColor: 'text-purple-600',
     description:
       'Luxury, wealth, and wisdom are often associated with lavender and plum shades of purple.',
   },
   {
     name: 'Blue',
     bgColor: 'bg-blue-500',
-    selectedColor: 'ring-blue-500',
+    bgColorHover: 'hover:bg-blue-600',
+    ringColor: 'ring-blue-500',
+    focusRingColor: 'focus:ring-blue-500',
+    borderColor: 'border-blue-500',
+    focusBorderColor: 'focus:border-blue-500',
+    textColor: 'text-blue-600',
     description:
       'Trust, loyalty, and wisdom are often associated with navy and sky shades of blue.',
   },
   {
     name: 'Green',
     bgColor: 'bg-green-500',
-    selectedColor: 'ring-green-500',
+    bgColorHover: 'hover:bg-green-600',
+    ringColor: 'ring-green-500',
+    focusRingColor: 'focus:ring-green-500',
+    borderColor: 'border-green-500',
+    focusBorderColor: 'focus:border-green-500',
+    textColor: 'text-green-600',
     description:
       'Nature, growth, and harmony are often associated with olive and mint shades of green.',
   },
   {
     name: 'Yellow',
     bgColor: 'bg-yellow-500',
-    selectedColor: 'ring-yellow-500',
+    bgColorHover: 'hover:bg-yellow-600',
+    ringColor: 'ring-yellow-500',
+    focusRingColor: 'focus:ring-yellow-500',
+    borderColor: 'border-yellow-500',
+    focusBorderColor: 'focus:border-yellow-500',
+    textColor: 'text-yellow-600',
     description:
       'Sunshine, happiness, and optimism are often associated with lemon and gold shades of yellow.',
   },
@@ -171,7 +213,8 @@ watch(
   () => selectedColor.value,
   (newValue) => {
     cart.value.theme = { ...newValue! };
-  }
+  },
+  { immediate: true }
 );
 
 watch(
@@ -182,6 +225,9 @@ watch(
       seatPerTableError.value = true;
     } else if (Number(newValue) < 4) {
       seatPerTableErrorMessage.value = 'Minimum seat per table is 4';
+      seatPerTableError.value = true;
+    } else if (Number(newValue) > 12) {
+      seatPerTableErrorMessage.value = 'Are you kidding?';
       seatPerTableError.value = true;
     } else {
       seatPerTableError.value = false;

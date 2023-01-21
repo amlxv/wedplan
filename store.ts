@@ -2,17 +2,12 @@ import { createGlobalState, useStorage } from '@vueuse/core';
 
 export const useGlobalState = createGlobalState(() => {
   const services = useStorage('services', [
-    { name: 'venue', selected: true, total: 0 },
-    { name: 'decoration', selected: false, total: 0 },
-    { name: 'catering', selected: false, total: 0 },
-    { name: 'dress', selected: false, total: 0 },
-    { name: 'gift', selected: false, total: 0 },
-    { name: 'others', selected: false, total: 0 },
-    // { name: 'deejay', selected: false, total: 0 },
-    // { name: 'kompang', selected: false, total: 0 },
-    // { name: 'photography', selected: false, total: 0 },
-    // { name: 'videography', selected: false, total: 0 },
-    // { name: 'emcee', selected: false, total: 0 },
+    { name: 'venue', selected: true },
+    { name: 'decoration', selected: false },
+    { name: 'catering', selected: false },
+    { name: 'dress', selected: false },
+    { name: 'gift', selected: false },
+    { name: 'others', selected: false },
   ]);
 
   const cart = useStorage('cart', {
@@ -26,9 +21,40 @@ export const useGlobalState = createGlobalState(() => {
     theme: {
       name: '',
       bgColor: '',
-      selectedColor: '',
+      bgColorHover: '',
+      ringColor: '',
+      focusRingColor: '',
+      borderColor: '',
+      focusBorderColor: '',
+      textColor: '',
+      description: '',
     },
     seatPerTable: 0,
+    catering: {
+      id: 0,
+      title: '',
+      description: '',
+      price: 0,
+    },
+    dress: {
+      id: 0,
+      title: '',
+      description: '',
+      price: 0,
+    },
+    gift: {
+      id: 0,
+      title: '',
+      description: '',
+      price: 0,
+    },
+    others: {
+      kompang: 0,
+      emcee: 0,
+      dj: 0,
+      photography: 0,
+      videography: 0,
+    },
   });
 
   return {

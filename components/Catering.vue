@@ -16,7 +16,11 @@
           <div
             :class="[
               checked ? 'border-transparent' : 'border-gray-300',
-              active ? 'border-indigo-500 ring-2 ring-indigo-500' : '',
+              active
+                ? (cart.theme?.borderColor || 'border-indigo-500') +
+                  ' ring-2 ' +
+                  (cart.theme?.ringColor || 'ring-indigo-500')
+                : '',
               'relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none',
             ]"
           >
@@ -44,13 +48,18 @@
               </span>
             </span>
             <CheckCircleIcon
-              :class="[!checked ? 'invisible' : '', 'h-5 w-5 text-indigo-600']"
+              :class="[
+                !checked ? 'invisible' : '',
+                'h-5 w-5 ' + (cart.theme?.textColor || 'text-indigo-600'),
+              ]"
               aria-hidden="true"
             />
             <span
               :class="[
                 active ? 'border' : 'border-2',
-                checked ? 'border-indigo-500' : 'border-transparent',
+                checked
+                  ? cart.theme?.borderColor || 'border-indigo-500'
+                  : 'border-transparent',
                 'pointer-events-none absolute -inset-px rounded-lg',
               ]"
               aria-hidden="true"
@@ -63,8 +72,13 @@
   <div class="mt-8 flex justify-between">
     <button
       type="button"
-      class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 pl-3 pr-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
       @click="changeStep('decoration')"
+      :class="[
+        cart.theme?.bgColor,
+        cart.theme?.bgColorHover,
+        cart.theme?.focusRingColor,
+      ]"
     >
       <ChevronLeftIcon class="mr-2 h-5 w-5" aria-hidden="true" />
       Back
@@ -73,8 +87,13 @@
       type="button"
       class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
       @click="changeStep('dress')"
+      :class="[
+        cart.theme?.bgColor,
+        cart.theme?.bgColorHover,
+        cart.theme?.focusRingColor,
+      ]"
     >
-      Nothing to wear?
+      Next
       <ChevronRightIcon class="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
     </button>
   </div>
@@ -92,6 +111,10 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from '@heroicons/vue/20/solid';
+
+import { useGlobalState } from '@/store';
+
+const { cart } = useGlobalState();
 
 const catering = [
   {
@@ -117,7 +140,14 @@ const catering = [
   },
 ];
 
-const selectedCateringPackage = ref(catering[0]);
+const findSelectedCateringPackageInStore = () => {
+  if (cart.value.catering.title) {
+    return catering.find((item) => item.title === cart.value.catering.title);
+  }
+  return catering[0];
+};
+
+const selectedCateringPackage = ref(findSelectedCateringPackageInStore());
 
 const { onToggleSelectedService } = defineProps({
   onToggleSelectedService: {
@@ -129,4 +159,12 @@ const { onToggleSelectedService } = defineProps({
 const changeStep = (serviceName: string) => {
   onToggleSelectedService(null, serviceName);
 };
+
+watch(
+  () => selectedCateringPackage.value,
+  (newValue) => {
+    cart.value.catering = { ...newValue! };
+  },
+  { immediate: true }
+);
 </script>

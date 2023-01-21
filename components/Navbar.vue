@@ -7,6 +7,7 @@
             <!-- Mobile menu button -->
             <DisclosureButton
               class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+              :class="cart.theme?.focusRingColor"
             >
               <span class="sr-only">Open main menu</span>
               <Bars3Icon
@@ -36,21 +37,27 @@
               v-for="item in navigation"
               :to="item.path"
               class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium"
-              :class="{
-                'border-indigo-500 text-gray-900': item.current,
-                'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700':
-                  !item.current,
-              }"
+              :class="
+                item.current
+                  ? (cart.theme?.borderColor || 'border-indigo-500') +
+                    ' text-gray-900'
+                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+              "
               >{{ item.name }}</NuxtLink
             >
           </div>
         </div>
-        <div class="flex items-center">
+        <div class="flex items-center" v-if="currentRoute.path == '/'">
           <div class="flex-shrink-0">
             <button
               type="button"
               class="relative inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              @click="reset"
+              @click="resetConfirmation"
+              :class="[
+                cart.theme?.bgColor,
+                cart.theme?.bgColorHover,
+                cart.theme?.focusRingColor,
+              ]"
             >
               <span>Reset</span>
             </button>
@@ -76,28 +83,47 @@
       </div>
     </DisclosurePanel>
   </Disclosure>
+  <AlertDialog
+    title="Warning"
+    text="Are you certain you wish to proceed? This action will clear all progress and revert your changes back to their original state. Any unsaved data will be lost. This cannot be undone."
+    cancelText="Cancel"
+    confirmText="Reset"
+    :confirmAction="resetProgress"
+    :isOpen="isAlertOpen"
+    :onClose="handleAlertClose"
+  />
 </template>
 
 <script setup lang="ts">
+import { useGlobalState } from '@/store';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline';
 
 const navigation = reactive([
   { name: 'Home', path: '/', current: true },
-  { name: 'Team', path: '/team', current: false },
-  { name: 'Projects', path: '/projects', current: false },
-  { name: 'Calendar', path: '/calendar', current: false },
+  { name: 'About Us', path: '/team', current: false },
 ]);
 
 const currentRoute = useRoute();
+const { cart } = useGlobalState();
 
-const reset = () => {
+const resetConfirmation = () => {
+  isAlertOpen.value = true;
+};
+
+const resetProgress = () => {
   localStorage.clear();
   location.reload();
 };
 
-watch(
-  () => currentRoute.path,
-  (path) => navigation.forEach((item) => (item.current = item.path === path))
-);
+watchEffect(() => {
+  navigation.forEach((item) => {
+    item.current = item.path === currentRoute.path;
+  });
+});
+
+const isAlertOpen = ref(false);
+const handleAlertClose = () => {
+  isAlertOpen.value = false;
+};
 </script>

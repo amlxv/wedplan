@@ -1,7 +1,6 @@
 <template>
   <ClientOnly>
     <Navbar />
-
     <main class="mt-8 pb-8">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <h1 class="sr-only">Page title</h1>
@@ -31,14 +30,13 @@
               </div>
             </section>
           </div>
-
           <!-- Right column -->
           <div class="grid grid-cols-1 gap-4">
             <section aria-labelledby="section-2-title">
               <h2 class="sr-only" id="section-2-title">Section title</h2>
               <div class="overflow-hidden rounded-lg bg-white">
                 <div class="p-6">
-                  <Cart />
+                  <Cart :onToggleSelectedService="handleServiceSelect" />
                 </div>
               </div>
             </section>
@@ -51,20 +49,34 @@
 
 <script setup lang="ts">
 import { useGlobalState } from '@/store';
+import { useHead } from '@vueuse/head';
 
 /** Import components for tabs pagination */
 const Venue = resolveComponent('Venue');
 const Catering = resolveComponent('Catering');
 const Decoration = resolveComponent('Decoration');
 const Dress = resolveComponent('Dress');
-const Deejay = resolveComponent('Deejay');
-const Kompang = resolveComponent('Kompang');
-const Photography = resolveComponent('Photography');
-const Videography = resolveComponent('Videography');
-const Emcee = resolveComponent('Emcee');
 const Gift = resolveComponent('Gift');
+const Others = resolveComponent('Others');
 
 const { services } = useGlobalState();
+
+useHead({
+  title: 'WedPlan - Wedding Planner',
+  meta: [
+    {
+      name: 'description',
+      content: 'A wedding planner app',
+    },
+  ],
+  link: [
+    {
+      rel: 'icon',
+      type: 'image/png',
+      href: '/assets/img/logo.png',
+    },
+  ],
+});
 
 /**
  * Required to initialize the selected service to
@@ -97,18 +109,10 @@ const getTabComponent = (service: any) => {
       return Decoration;
     case 'dress':
       return Dress;
-    case 'deejay':
-      return Deejay;
-    case 'kompang':
-      return Kompang;
-    case 'photography':
-      return Photography;
-    case 'videography':
-      return Videography;
-    case 'emcee':
-      return Emcee;
     case 'gift':
       return Gift;
+    case 'others':
+      return Others;
     default:
       return Venue;
   }
