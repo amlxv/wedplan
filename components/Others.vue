@@ -37,6 +37,9 @@
         cart.theme?.bgColorHover,
         cart.theme?.focusRingColor,
       ]"
+      data-tooltips="Go Back"
+      data-tooltips-position="top"
+      @mouseenter="handleTooltipsOnHover"
     >
       <ChevronLeftIcon class="mr-2 h-5 w-5" aria-hidden="true" />
       Back
@@ -46,6 +49,7 @@
 
 <script setup lang="ts">
 import { useGlobalState } from '@/store';
+import { handleTooltipsOnHover } from '@/utils/handlers';
 import { ChevronLeftIcon } from '@heroicons/vue/20/solid';
 
 const { onToggleSelectedService } = defineProps({

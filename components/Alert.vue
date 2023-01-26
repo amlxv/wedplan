@@ -98,6 +98,7 @@ const props = defineProps([
   'onClose',
   'status',
 ]);
+
 const { isOpen } = toRefs(props);
 
 const open = ref(false);

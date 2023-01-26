@@ -121,6 +121,9 @@
         cart.theme?.bgColorHover,
         cart.theme?.focusRingColor,
       ]"
+      data-tooltips="Next Step"
+      data-tooltips-position="top"
+      @mouseenter="handleTooltipsOnHover"
     >
       Next
       <ChevronRightIcon class="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
@@ -129,6 +132,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGlobalState } from '@/store';
+import { handleTooltipsOnHover } from '@/utils/handlers';
 import {
   RadioGroup,
   RadioGroupDescription,
@@ -140,8 +145,6 @@ import {
   ChevronRightIcon,
   ExclamationCircleIcon,
 } from '@heroicons/vue/20/solid';
-
-import { useGlobalState } from '@/store';
 
 const { cart } = useGlobalState();
 

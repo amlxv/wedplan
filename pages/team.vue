@@ -70,11 +70,6 @@ const people = [
     imageUrl: '/assets/img/avatars/amrie.png',
   },
   {
-    name: 'Azim',
-    role: 'Web Analytics Specialist',
-    imageUrl: '/assets/img/avatars/azim.png',
-  },
-  {
     name: 'Amirul',
     role: 'Full-Stack Developer',
     imageUrl: '/assets/img/avatars/amirul.png',

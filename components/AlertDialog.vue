@@ -106,6 +106,7 @@ const props = defineProps([
   'confirmText',
   'confirmAction',
 ]);
+
 const { isOpen } = toRefs(props);
 
 const open = ref(false);

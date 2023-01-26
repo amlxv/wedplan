@@ -4,13 +4,16 @@
       <RadioGroupLabel class="block text-base font-medium text-gray-900 mb-3"
         >Pick a color for your theme</RadioGroupLabel
       >
-      <div class="mt-4 flex items-center space-x-3">
+      <div class="mt-4 flex items-center space-x-3 relative">
         <RadioGroupOption
           as="template"
           v-for="color in colors"
           :key="color.name"
           :value="color"
           v-slot="{ active, checked }"
+          :data-tooltips="color.name"
+          data-tooltips-position="top"
+          @mouseenter="handleTooltipsOnHover"
         >
           <div
             :class="[
@@ -89,6 +92,9 @@
         selectedColor?.focusRingColor,
       ]"
       @click="changeStep('venue')"
+      data-tooltips="Go Back"
+      data-tooltips-position="top"
+      @mouseenter="handleTooltipsOnHover"
     >
       <ChevronLeftIcon class="mr-2 h-5 w-5" aria-hidden="true" />
       Back
@@ -102,6 +108,9 @@
         selectedColor?.focusRingColor,
       ]"
       @click="changeStep('catering')"
+      data-tooltips="Next Step"
+      data-tooltips-position="top"
+      @mouseenter="handleTooltipsOnHover"
     >
       Next
       <ChevronRightIcon class="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
@@ -111,6 +120,7 @@
 
 <script setup lang="ts">
 import { useGlobalState } from '@/store';
+import { handleTooltipsOnHover } from '@/utils/handlers';
 import { RadioGroup, RadioGroupLabel, RadioGroupOption } from '@headlessui/vue';
 import {
   ChevronLeftIcon,
